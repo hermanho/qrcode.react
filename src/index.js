@@ -4,10 +4,7 @@
 
 const React = require('react');
 const PropTypes = require('prop-types');
-// qr.js doesn't handle error level of zero (M) so we need to do it right,
-// thus the deep require.
-const QRCodeImpl = require('qr.js/lib/QRCode');
-const ErrorCorrectLevel = require('qr.js/lib/ErrorCorrectLevel');
+const qrcode = require('qrcode');
 
 // TODO: pull this off of the QRCode class type so it matches.
 type Modules = Array<Array<boolean>>;
@@ -49,7 +46,7 @@ function convertStr(str: string): string {
 type QRProps = {
   value: string,
   size: number,
-  level: $Keys<typeof ErrorCorrectLevel>,
+  level: 'L' | 'M' | 'Q' | 'H',
   bgColor: string,
   fgColor: string,
   style?: ?Object,
@@ -241,10 +238,9 @@ class QRCodeCanvas extends React.PureComponent<QRProps, {imgLoaded: boolean}> {
       imageSettings,
     } = this.props;
 
-    // We'll use type===-1 to force QRCode to automatically pick the best type
-    const qrcode = new QRCodeImpl(-1, ErrorCorrectLevel[level]);
-    qrcode.addData(convertStr(value));
-    qrcode.make();
+    const qrcodeObj = qrcode.create(convertStr(value), {
+      errorCorrectionLevel: level,
+    });
 
     if (this._canvas != null) {
       const canvas = this._canvas;
@@ -254,7 +250,7 @@ class QRCodeCanvas extends React.PureComponent<QRProps, {imgLoaded: boolean}> {
         return;
       }
 
-      let cells = qrcode.modules;
+      let cells = qrcodeObj.modules.data;
       if (cells === null) {
         return;
       }
@@ -378,12 +374,11 @@ class QRCodeSVG extends React.PureComponent<QRProps> {
       ...otherProps
     } = this.props;
 
-    // We'll use type===-1 to force QRCode to automatically pick the best type
-    const qrcode = new QRCodeImpl(-1, ErrorCorrectLevel[level]);
-    qrcode.addData(convertStr(value));
-    qrcode.make();
+    const qrcodeObj = qrcode.create(convertStr(value), {
+      errorCorrectionLevel: level,
+    });
 
-    let cells = qrcode.modules;
+    let cells = qrcodeObj.modules.data;
     if (cells === null) {
       return null;
     }
