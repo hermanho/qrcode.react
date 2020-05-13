@@ -1,7 +1,7 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: 2016,
+    ecmaVersion: 2018,
     sourceType: 'module',
     ecmaFeatures: {
       jsx: true,
@@ -12,14 +12,14 @@ module.exports = {
     node: true,
     browser: true,
   },
-  plugins: ['react'],
+  plugins: ['@typescript-eslint', 'prettier', 'react', 'react-hooks'],
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
     'plugin:react/recommended',
-    'plugin:flowtype/recommended',
     'plugin:prettier/recommended',
-    'prettier/react',
-    'prettier/flowtype',
+    'prettier/@typescript-eslint',
+    'prettier',
   ],
   settings: {
     react: {
@@ -28,5 +28,7 @@ module.exports = {
   },
   rules: {
     'no-unused-vars': ['error', {ignoreRestSiblings: true}],
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
   },
 };
